@@ -67,7 +67,7 @@ File: `<plans folder>/YYYY-MM-DD-<topic-kebab>.md`, with the layout in `template
 - Run `python3 <this skill>/scripts/lint_plan.py <plan file>` (use `python` if `python3` is missing). Fix every error and re-run until it passes. Warnings: fix or justify in the plan.
 
 ### 7. Hand off
-In chat: a 3-6 line summary of the plan, the prompt block (first phase if there are several), and the path to the plan file. Close with both ways to start:
+In chat: a 3-6 line summary of the plan, the **full prompt block pasted in the message** (first phase if there are several; never only "it is in the plan file"), and the path to the plan file. Close with both ways to start:
 - Automatic: `python3 <absolute path to this skill>/scripts/run_plan.py <absolute plan path>` (opens a new `claude --model <executor>` session in the repo with the prompt).
 - Manual: "Open a session with the executor model in <repo> and paste the prompt."
 Then: "When it finishes: `/plan-for-executor review <plan>`" (or `next <plan>` if more phases remain).

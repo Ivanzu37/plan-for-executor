@@ -40,4 +40,5 @@ graders:
     criteria: |
       The answer says step 1 (the --verbose flag) is done but step 2 (printing "N tasks" in cmd_list) is missing,
       so the executor's report is wrong; the verdict is not "accepted"; and it gives a fix prompt in a fenced block
-      that only covers the missing work in cmd_list, with absolute paths and a STOP AND REPORT IF block.
+      for the missing cmd_list work (adding a test for it is fine, since the plan lists tests/test_cli.py), with
+      absolute paths and a STOP AND REPORT IF block, and without redoing step 1.
