@@ -9,8 +9,8 @@
 A Claude Code plugin that turns a coding task into a checked plan and a ready-to-run prompt,<br>
 then reviews what the executor did and hands out the next phase. The planner never touches your code.
 
-[![test](https://github.com/Ivanzu37/plan-sonnet/actions/workflows/test.yml/badge.svg)](https://github.com/Ivanzu37/plan-sonnet/actions/workflows/test.yml)
-[![release](https://img.shields.io/github/v/release/Ivanzu37/plan-sonnet?label=release&color=B85C38)](https://github.com/Ivanzu37/plan-sonnet/releases)
+[![test](https://github.com/Ivanzu37/plan-for-executor/actions/workflows/test.yml/badge.svg)](https://github.com/Ivanzu37/plan-for-executor/actions/workflows/test.yml)
+[![release](https://img.shields.io/github/v/release/Ivanzu37/plan-for-executor?label=release&color=B85C38)](https://github.com/Ivanzu37/plan-for-executor/releases)
 [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 </div>
@@ -18,7 +18,7 @@ then reviews what the executor did and hands out the next phase. The planner nev
 ## Install
 
 ```text
-/plugin install plan-for-executor --marketplace Ivanzu37/plan-sonnet
+/plugin install plan-for-executor --marketplace Ivanzu37/plan-for-executor
 ```
 
 Then, in any repo:
@@ -109,7 +109,7 @@ Skip it for one-line fixes and quick experiments: writing a plan costs more than
 
 ## Issues and ideas
 
-Found a bug or have an idea? [Open an issue](https://github.com/Ivanzu37/plan-sonnet/issues/new/choose). The templates ask for what is needed to reproduce it; remove private paths from any plan you paste.
+Found a bug or have an idea? [Open an issue](https://github.com/Ivanzu37/plan-for-executor/issues/new/choose). The templates ask for what is needed to reproduce it; remove private paths from any plan you paste.
 
 Pull requests are welcome. Keep the planner read-only, and run the unit tests and the lint on `examples/` before sending one.
 
