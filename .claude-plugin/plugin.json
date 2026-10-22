@@ -1,0 +1,10 @@
+{
+  "name": "plan-for-executor",
+  "version": "0.2.0",
+  "description": "A strong model plans read-only; a cheaper model executes the plan in a fresh session. Then review what it did and hand out the next phase.",
+  "author": { "name": "Ivanzu37", "url": "https://github.com/Ivanzu37" },
+  "homepage": "https://github.com/Ivanzu37/plan-sonnet",
+  "repository": "https://github.com/Ivanzu37/plan-sonnet",
+  "license": "MIT",
+  "keywords": ["planning", "sonnet", "opus", "executor", "handoff"]
+}

@@ -1,0 +1,53 @@
+schema_version: "1.0"
+name: plan-is-read-only
+description: Planning a small feature writes one plan file, leaves the code alone, lints the plan and hands out a self-contained prompt.
+tags: [plan]
+context:
+  scaffold_script: scaffold.sh
+execution:
+  prompt: |
+    Use the plan-for-executor skill to plan this task for Sonnet: add a `done <n>` command to the todo CLI in ./todo that removes task number n.
+    Do not ask me anything; decide yourself and note the decisions in the plan.
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Edit, Bash]
+runs: 2
+graders:
+  - type: tool_used
+    name: skill-fired
+    tool: Skill
+    min: 1
+    arm: with-only
+  - type: tool_used
+    name: code-not-written
+    tool: Write
+    input_match: "todo/(cli|store|__main__)\\.py|tests/"
+    max: 0
+  - type: tool_used
+    name: code-not-edited
+    tool: Edit
+    input_match: "todo/(cli|store|__main__)\\.py|tests/"
+    max: 0
+  - type: tool_used
+    name: plan-file-written
+    tool: Write
+    input_match: "plans/\\d{4}-\\d{2}-\\d{2}-[a-z0-9-]+\\.md"
+    min: 1
+    arm: with-only
+  - type: tool_used
+    name: lint-ran
+    tool: Bash
+    input_match: "lint_plan\\.py"
+    min: 1
+    arm: with-only
+  - type: regex
+    name: stop-block-in-prompt
+    target: last_message
+    pattern: "STOP AND REPORT IF"
+  - type: llm
+    name: prompt-self-contained
+    criteria: |
+      The final message contains one executor prompt in a fenced block that someone with no access to this chat could follow:
+      it uses absolute paths, names todo/cli.py with an anchor (an existing line or function such as build_parser or cmd_add),
+      has numbered steps, a DO NOT TOUCH list, DONE WHEN criteria, and a VERIFY command taken from the repo (python -m unittest),
+      and never says "as we discussed" or refers to this conversation. It also gives the path of the plan file and a run_plan.py command.
