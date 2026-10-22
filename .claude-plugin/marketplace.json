@@ -1,6 +1,10 @@
 {
   "name": "plan-sonnet",
-  "owner": { "name": "Ivanzu37", "url": "https://github.com/Ivanzu37" },
+  "description": "Plan with a strong model, execute with a cheaper one, review the result.",
+  "owner": {
+    "name": "Ivanzu37",
+    "url": "https://github.com/Ivanzu37"
+  },
   "plugins": [
     {
       "name": "plan-for-executor",

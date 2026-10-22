@@ -16,6 +16,7 @@
 - Spanish labels for plans written in Spanish.
 
 ### Changed
+- Plugin icon, issue templates and an "Issues and ideas" section in the README.
 - Skill moved to `skills/plan-for-executor/`; layout and prompt template moved to `template.md`.
 - Fixed `status` values: `draft · approved · in-progress · blocked · done · dropped`; progress goes in `phase: N/M`.
 - `allowed-tools` made read-only for real: removed `find`, `cat`, `head`, `tail` and `git branch*`; added `Edit` (plan file only) and the lint.
