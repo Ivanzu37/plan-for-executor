@@ -23,9 +23,11 @@ jobs:
           bad='{"tool_name":"Bash","tool_input":{"command":"echo x >> plan.md"}}'
           # the exact command from SKILL.md
           cmd=$(sed -n 's/^ *command: //p' $D/SKILL.md | sed "s/^'//; s/'$//")
-          # Claude Code sets CLAUDE_PLUGIN_ROOT to the skill folder for skill hooks
-          run() { CLAUDE_PLUGIN_ROOT=$D bash -c "$cmd"; }
-          echo "$ok" | run
-          if echo "$bad" | run; then echo "guard did not block"; exit 1; fi
-          # a missing script must let commands through, never block everything
-          echo "$bad" | CLAUDE_PLUGIN_ROOT=/nonexistent bash -c "$cmd"
+          # CLAUDE_PLUGIN_ROOT is the skill folder for a copied skill, the plugin root for an installed plugin
+          for root in "$D" "$PWD"; do
+            echo "$ok" | CLAUDE_PLUGIN_ROOT=$root bash -c "$cmd"
+            if echo "$bad" | CLAUDE_PLUGIN_ROOT=$root bash -c "$cmd"; then echo "guard did not block (root $root)"; exit 1; fi
+          done
+          # a missing script is a visible, non-blocking error (exit 1), never a block (exit 2)
+          set +e; echo "$bad" | CLAUDE_PLUGIN_ROOT=/nonexistent bash -c "$cmd"; code=$?; set -e
+          [ "$code" = 1 ] || { echo "missing script gave exit $code"; exit 1; }

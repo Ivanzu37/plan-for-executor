@@ -8,7 +8,7 @@ hooks:
     - matcher: "Bash|Write|Edit|MultiEdit|NotebookEdit"
       hooks:
         - type: command
-          command: 'G="${CLAUDE_PLUGIN_ROOT}/scripts/guard_readonly.py"; [ -f "$G" ] || exit 0; P=python3; "$P" -c "" 2>/dev/null || P=python; "$P" "$G"'
+          command: 'R="${CLAUDE_PLUGIN_ROOT}"; for G in "$R/scripts/guard_readonly.py" "$R/skills/plan-for-executor/scripts/guard_readonly.py"; do [ -f "$G" ] && break; done; [ -f "$G" ] || { echo "plan-for-executor: guard_readonly.py not found under $R; the read-only guard is off" >&2; exit 1; }; P=python3; "$P" -c "" 2>/dev/null || P=python; "$P" "$G"'
 ---
 
 # Plan for executor
