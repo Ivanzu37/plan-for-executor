@@ -43,7 +43,7 @@ You get a plan file, a prompt, and one command that opens the executor with it. 
 3. **Review.** `/plan-for-executor review <plan>` compares the report and the git diff with the plan, step by step, and writes a fix prompt if something is missing.
 4. **Next.** `/plan-for-executor next <plan>` adjusts the following phase to what really happened and hands out its prompt.
 
-In the [eval suite](evals/), the planner never edited project code, and `review` and `next` caught the missing step and the renamed function. Without the plugin, Claude missed both.
+In the [eval suite](evals/) (4 cases, 2 runs each) the plugin passes all 8 runs: the planner never edits project code, the guard blocks a shell write, and `review` and `next` catch a skipped step and a renamed function. Without the plugin, Claude fails 3 of the 4 cases.
 
 ## Why split planning from execution
 
@@ -105,7 +105,7 @@ Skip it for one-line fixes and quick experiments: writing a plan costs more than
 - **Read-only planner.** `allowed-tools` only allows reading, plus writing the plan. A `PreToolUse` guard hook (`scripts/guard_readonly.py`) blocks shell writes (`>`, `>>`, `tee`, `sed -i`, `rm`, git commands that change the repo) and edits to anything that is not Markdown while the skill runs.
 - **Plan format.** `status` is one of `draft · approved · in-progress · blocked · done · dropped` (Spanish: `borrador · aprobado · en-curso · bloqueado · hecho · descartado`); progress lives in `phase: N/M`. The layout and the prompt template are in [`template.md`](skills/plan-for-executor/template.md).
 - **Lint.** `lint_plan.py` checks frontmatter, sections, one prompt block per phase, every prompt label, and references to the planning conversation. The planner runs it before every hand-off.
-- **Tests.** Unit tests for the scripts run on Linux, macOS and Windows: `python3 -m unittest discover -s tests`. The behaviour evals build toy repos and use your Claude quota: `claude plugin eval . --scaffold --allow-tools Bash Write Edit`.
+- **Tests.** Unit tests for the scripts run on Linux, macOS and Windows: `python3 -m unittest discover -s tests`. The behaviour evals build toy repos and use your Claude quota: `claude plugin eval . --scaffold --allow-tools Bash Write Edit --judge-model sonnet` (the default judge is noisier).
 
 ## Issues and ideas
 
