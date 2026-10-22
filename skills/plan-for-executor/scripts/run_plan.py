@@ -39,6 +39,9 @@ def pick_prompt(text, phase=None, review_fix=False):
 
 
 def main(argv):
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="replace")
     ap = argparse.ArgumentParser(description="Start the executor session for a plan.")
     ap.add_argument("plan")
     ap.add_argument("--phase", type=int)
