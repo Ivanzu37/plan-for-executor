@@ -16,6 +16,7 @@
 - Spanish labels for plans written in Spanish.
 
 ### Changed
+- The lint requires every prompt label (WORKING MODE and BEFORE STARTING too), also in review fix prompts; the full prompt is always pasted in chat at hand-off.
 - Plugin icon, issue templates and an "Issues and ideas" section in the README.
 - Skill moved to `skills/plan-for-executor/`; layout and prompt template moved to `template.md`.
 - Fixed `status` values: `draft · approved · in-progress · blocked · done · dropped`; progress goes in `phase: N/M`.
