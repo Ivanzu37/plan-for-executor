@@ -16,6 +16,7 @@
 - Spanish labels for plans written in Spanish.
 
 ### Changed
+- `guard_readonly.py`: a skill-scoped PreToolUse hook that blocks shell writes (`>`, `>>`, `tee`, `sed -i`, `rm`, state-changing git…) and Write/Edit on non-Markdown files.
 - The lint requires every prompt label (WORKING MODE and BEFORE STARTING too), also in review fix prompts; the full prompt is always pasted in chat at hand-off.
 - Plugin icon, issue templates and an "Issues and ideas" section in the README.
 - Skill moved to `skills/plan-for-executor/`; layout and prompt template moved to `template.md`.

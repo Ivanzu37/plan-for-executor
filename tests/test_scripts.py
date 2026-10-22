@@ -13,6 +13,7 @@ sys.path.insert(0, SCRIPTS)
 
 import lint_plan  # noqa: E402
 import planlib  # noqa: E402
+import guard_readonly  # noqa: E402
 import run_plan  # noqa: E402
 
 with open(EXAMPLE, encoding="utf-8") as fh:
@@ -142,6 +143,25 @@ class PlanlibTest(unittest.TestCase):
     def test_labels_do_not_collide(self):
         found = planlib.label_lines("VERIFICA\nx\nCONTEXTO\n")
         self.assertEqual(set(found), {"verify", "context"})
+
+
+class GuardTest(unittest.TestCase):
+    def blocked(self, tool, **data):
+        return guard_readonly.check({"tool_name": tool, "tool_input": data}) is not None
+
+    def test_allows_reading(self):
+        for cmd in ["git log --oneline -10", "git diff a..HEAD -- x.py 2>&1", "ls x >/dev/null 2>&1",
+                    "git branch --show-current", 'grep "a > b" f', "python3 s/lint_plan.py p.md"]:
+            self.assertFalse(self.blocked("Bash", command=cmd), cmd)
+
+    def test_blocks_shell_writes(self):
+        for cmd in ["cat >> plans/p.md <<EOF", "echo hi > a.txt", "printf x | tee f", "sed -i s/a/b/ f",
+                    "find . -delete", "git branch -D x", "git log --output=x", "rm -rf build", "git commit -m x"]:
+            self.assertTrue(self.blocked("Bash", command=cmd), cmd)
+
+    def test_only_markdown_is_editable(self):
+        self.assertFalse(self.blocked("Edit", file_path="/r/plans/p.md"))
+        self.assertTrue(self.blocked("Write", file_path="/r/todo/cli.py"))
 
 
 class RunPlanTest(unittest.TestCase):
