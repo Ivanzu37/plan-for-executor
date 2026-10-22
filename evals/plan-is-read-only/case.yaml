@@ -14,6 +14,12 @@ execution:
 runs: 2
 graders:
   - type: tool_used
+    name: no-shell-writes
+    tool: Bash
+    input_match: 'command\W+[^"]*(>>|\btee\b|sed -i)'
+    min: 0
+    max: 0
+  - type: tool_used
     name: skill-fired
     tool: Skill
     min: 1
@@ -21,12 +27,14 @@ graders:
   - type: tool_used
     name: code-not-written
     tool: Write
-    input_match: "todo/(cli|store|__main__)\\.py|tests/"
+    input_match: 'file_path\W+[^"]*(todo/(cli|store|__main__)\.py|tests/[^"]*)"'
+    min: 0
     max: 0
   - type: tool_used
     name: code-not-edited
     tool: Edit
-    input_match: "todo/(cli|store|__main__)\\.py|tests/"
+    input_match: 'file_path\W+[^"]*(todo/(cli|store|__main__)\.py|tests/[^"]*)"'
+    min: 0
     max: 0
   - type: tool_used
     name: plan-file-written

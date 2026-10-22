@@ -3,6 +3,12 @@ name: plan-for-executor
 description: Plan a coding task read-only with a strong model and produce a self-contained prompt that a second, cheaper model (e.g. Sonnet) executes in a fresh session; then review what the executor did and hand out the next phase. Writes only to the plan file and never edits the project. Use when the user types /plan-for-executor (optionally `review <plan>` or `next <plan>`) or asks to "plan this for Sonnet", "prepare a prompt for the executor", "plan first, someone else implements", "review what Sonnet did" or "give me the next phase".
 argument-hint: "[review|next] <task | plan file> [repo path]"
 allowed-tools: Read, Glob, Grep, Write, Edit, AskUserQuestion, Bash(ls *), Bash(wc *), Bash(date *), Bash(git status*), Bash(git log *), Bash(git diff *), Bash(git show *), Bash(git rev-parse *), Bash(git branch --show-current), Bash(git branch --list*), Bash(python3 *lint_plan.py *), Bash(python *lint_plan.py *)
+hooks:
+  PreToolUse:
+    - matcher: "Bash|Write|Edit|MultiEdit|NotebookEdit"
+      hooks:
+        - type: command
+          command: 'R="${CLAUDE_PLUGIN_ROOT}"; for G in "$R/scripts/guard_readonly.py" "$R/skills/plan-for-executor/scripts/guard_readonly.py"; do [ -f "$G" ] && break; done; [ -f "$G" ] || { echo "plan-for-executor: guard_readonly.py not found under $R; the read-only guard is off" >&2; exit 1; }; P=python3; "$P" -c "" 2>/dev/null || P=python; "$P" "$G"'
 ---
 
 # Plan for executor
@@ -13,7 +19,7 @@ Someone else (a cheaper model in a new session) executes the plan and **will not
 Files next to this `SKILL.md`:
 - `template.md` → plan layout, executor prompt, labels in other languages, self-check. Read it before writing a plan.
 - `modes/review.md` → the `review` mode. `modes/next.md` → the `next` mode.
-- `scripts/lint_plan.py` → checks a plan file. `scripts/run_plan.py` → opens the executor session with the prompt.
+- `scripts/lint_plan.py` → checks a plan file. `scripts/run_plan.py` → opens the executor session with the prompt. `scripts/guard_readonly.py` → hook that blocks shell writes and edits to non-Markdown files while this skill runs.
 
 ## Mode
 
@@ -33,7 +39,7 @@ Read the first word of `$ARGUMENTS`:
 ## Hard rules
 
 - Read-only on the project. Do not edit, create, delete, build, install, run tests, or commit anything in the repo.
-- Never use `--output`, `-delete`, `-exec`, `>` or `>>` in a shell command. Read files with Read, find them with Glob/Grep.
+- Never use `--output`, `-delete`, `-exec`, `>`, `>>`, `tee` or `sed -i` in a shell command. Read files with Read, find them with Glob/Grep. Change the plan only with Write (new file) or Edit (anything after): to append a section, Edit the plan's last lines. A guard hook blocks the rest.
 - Do not spawn subagents.
 - The only file you write or edit is the plan, inside the plans folder.
 - Do not invent. Every path, symbol, and command in the prompt must be something you saw this session. Anything unverified becomes an explicit "check first" step for the executor.
@@ -67,7 +73,7 @@ File: `<plans folder>/YYYY-MM-DD-<topic-kebab>.md`, with the layout in `template
 - Run `python3 <this skill>/scripts/lint_plan.py <plan file>` (use `python` if `python3` is missing). Fix every error and re-run until it passes. Warnings: fix or justify in the plan.
 
 ### 7. Hand off
-In chat: a 3-6 line summary of the plan, the prompt block (first phase if there are several), and the path to the plan file. Close with both ways to start:
+In chat: a 3-6 line summary of the plan, the **full prompt block pasted in the message** (first phase if there are several; never only "it is in the plan file"), and the path to the plan file. Close with both ways to start:
 - Automatic: `python3 <absolute path to this skill>/scripts/run_plan.py <absolute plan path>` (opens a new `claude --model <executor>` session in the repo with the prompt).
 - Manual: "Open a session with the executor model in <repo> and paste the prompt."
 Then: "When it finishes: `/plan-for-executor review <plan>`" (or `next <plan>` if more phases remain).

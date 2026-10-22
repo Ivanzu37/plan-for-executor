@@ -13,6 +13,7 @@ first and refuses to start on errors unless --force. Then starts
 """
 import argparse
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -38,7 +39,37 @@ def pick_prompt(text, phase=None, review_fix=False):
     return blocks[phase]
 
 
+def resolve_command(claude):
+    """Return the argv prefix that starts `claude`.
+
+    On Windows, npm installs `claude.cmd`, and cmd.exe cuts arguments at the
+    first newline, so a multi-line prompt would arrive as its first line only.
+    For such a shim, call node with the script the shim points to instead.
+    """
+    if os.name != "nt" or not claude.lower().endswith((".cmd", ".bat")):
+        return [claude]
+    with open(claude, encoding="utf-8", errors="replace") as fh:
+        shim = fh.read()
+    m = re.search(r'"%~?dp0%?\\?([^"]+?\.(?:c|m)?js)"', shim, re.IGNORECASE)
+    if not m:
+        raise SystemExit(
+            "%s is a .cmd shim this script cannot read, and cmd.exe would cut the prompt at its "
+            "first line. Install Claude Code with the native installer, or use --print and paste "
+            "the prompt by hand." % claude
+        )
+    base = os.path.dirname(claude)
+    script = os.path.join(base, m.group(1))
+    local_node = os.path.join(base, "node.exe")
+    node = local_node if os.path.exists(local_node) else shutil.which("node")
+    if not node or not os.path.exists(script):
+        raise SystemExit("cannot find node or %s; use --print and paste the prompt by hand" % script)
+    return [node, script]
+
+
 def main(argv):
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="replace")
     ap = argparse.ArgumentParser(description="Start the executor session for a plan.")
     ap.add_argument("plan")
     ap.add_argument("--phase", type=int)
@@ -74,7 +105,7 @@ def main(argv):
         print("`claude` is not on PATH; use --print and paste the prompt by hand", file=sys.stderr)
         return 1
     print("Starting %s in %s ..." % (model, cwd), file=sys.stderr)
-    return subprocess.call([claude, "--model", model, prompt], cwd=cwd)
+    return subprocess.call(resolve_command(claude) + ["--model", model, prompt], cwd=cwd)
 
 
 if __name__ == "__main__":

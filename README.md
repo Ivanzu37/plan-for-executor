@@ -1,197 +1,118 @@
 <div align="center">
 
-# 🧠 → 🛠️ plan-for-executor
+<img src="assets/brand/icon.svg" width="96" height="96" alt="plan-for-executor icon: a large chevron handing off to a smaller one">
 
-**A strong model plans. A cheaper model executes. The strong model checks the result.**
-A [Claude Code](https://claude.com/claude-code) skill that turns any coding task into a reviewed plan file and a prompt for a fresh session, then reviews what the executor did and hands out the next phase.
+# plan-for-executor
 
-![Claude Code](https://img.shields.io/badge/Claude%20Code-plugin-D97757)
-![Planner](https://img.shields.io/badge/planner-read--only-2ea44f)
-![Version](https://img.shields.io/badge/version-0.2.0-informational)
-![License](https://img.shields.io/badge/license-MIT-blue)
+**Plan with your strongest model. Execute with a cheaper one.**
+
+A Claude Code plugin that turns a coding task into a checked plan and a ready-to-run prompt,<br>
+then reviews what the executor did and hands out the next phase. The planner never touches your code.
+
+[![test](https://github.com/Ivanzu37/plan-for-executor/actions/workflows/test.yml/badge.svg)](https://github.com/Ivanzu37/plan-for-executor/actions/workflows/test.yml)
+[![release](https://img.shields.io/github/v/release/Ivanzu37/plan-for-executor?label=release&color=B85C38)](https://github.com/Ivanzu37/plan-for-executor/releases)
+[![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 </div>
 
----
-
-## ✨ In 20 seconds
+## Install
 
 ```text
-you ──► /plan-for-executor "add pagination to /users"
-          │
-          ▼
-   🧠 PLANNER (e.g. Opus)             reads the repo, edits nothing
-          │
-          ├──► 📄 plans/2026-10-22-add-pagination.md   (plan + prompt, linted)
-          └──► ▶  run_plan.py <plan>                    (opens the executor)
-                         │
-                         ▼
-           🛠️ EXECUTOR (e.g. Sonnet), new session ──► code + execution report
-                         │
-                         ▼
-you ──► /plan-for-executor review <plan>   ✅ ⚠️ ❌ per step, fix prompt if needed
-you ──► /plan-for-executor next <plan>     next phase, adjusted to what happened
+/plugin install plan-for-executor --marketplace Ivanzu37/plan-for-executor
 ```
 
-## 🔄 How it works
+Then, in any repo:
 
-```mermaid
-flowchart LR
-    A["/plan-for-executor<br/>task"] --> B["Orient + explore<br/>CLAUDE.md, git, HEAD sha,<br/>anchors in the code"]
-    B --> C{"Size"}
-    C -- tiny --> P["Prompt only"]
-    C -- normal / large --> D["Plan file<br/>phases of ≤6 steps"]
-    D --> L["lint_plan.py"]
-    L --> R["run_plan.py<br/>claude --model sonnet"]
-    R --> X["Executor<br/>appends report"]
-    X --> V["review"]
-    V -- "❌" --> F["fix prompt"] --> R
-    V -- "✅, more phases" --> N["next"] --> R
-    V -- "✅, last phase" --> Z(["done"])
-
-    style A fill:#D97757,color:#fff
-    style Z fill:#2ea44f,color:#fff
+```text
+/plan-for-executor:plan-for-executor add pagination to the /users endpoint
 ```
 
-## 🤔 Why split planning from execution?
+You get a plan file, a prompt, and one command that opens the executor with it. Prefer plain words? "Plan this for Sonnet" works too.
 
-| | 🧠 Planner | 🛠️ Executor |
+## How it works
+
+<picture>
+  <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset="assets/cycle-vertical-dark.svg">
+  <source media="(max-width: 600px)" srcset="assets/cycle-vertical-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="assets/cycle-dark.svg">
+  <img src="assets/cycle-light.svg" alt="The cycle: Plan with a strong model, Execute with a cheaper model in a fresh session, Review the diff against the plan, then Next phase or done. If the review finds something missing, a fix prompt goes back to Execute." width="880">
+</picture>
+
+1. **Plan.** The planner reads the repo, asks only what blocks it, and writes `plans/YYYY-MM-DD-topic.md`: decisions, steps tied to real lines of code, and the executor prompt.
+2. **Execute.** `run_plan.py` opens `claude --model sonnet` in the repo with that prompt. The executor works in a fresh session and writes a report back into the plan.
+3. **Review.** `/plan-for-executor review <plan>` compares the report and the git diff with the plan, step by step, and writes a fix prompt if something is missing.
+4. **Next.** `/plan-for-executor next <plan>` adjusts the following phase to what really happened and hands out its prompt.
+
+In the [eval suite](evals/) (4 cases, 2 runs each) the plugin passes all 8 runs: the planner never edits project code, the guard blocks a shell write, and `review` and `next` catch a skipped step and a renamed function. Without the plugin, Claude fails 3 of the 4 cases.
+
+## Why split planning from execution
+
+| | Planner | Executor |
 |---|---|---|
-| **Job** | Understand, decide, specify, check | Type out a well-specified change |
-| **Model** | Strongest you have | Faster / cheaper |
-| **Context** | Whole conversation | Only the prompt, fresh session |
-| **Touches the repo?** | ❌ Never | ✅ Yes |
-| **Output** | Plan file, prompt, review | Code changes + execution report |
+| **Job** | Understand, decide, specify, check | Carry out a well-specified change |
+| **Model** | The strongest you have | Faster and cheaper |
+| **Context** | The whole conversation | Only the prompt, in a fresh session |
+| **Touches the repo** | Never | Yes |
+| **Output** | Plan, prompt, review | Code changes and a report |
 
-## 🛡️ Guarantees
+Expensive reasoning is spent once, where it matters. The executor starts clean and follows the plan literally. And the plan is a file you can read, review and keep.
 
-| ✅ The planner does | ❌ The planner never |
+## What the executor gets
+
+Every prompt is self-contained, with absolute paths and nothing like "as we discussed". It also carries four safeguards so a cheaper model stops instead of improvising:
+
+- **Base commit.** If the planned files changed since the plan was written, it stops.
+- **Anchors.** Every step names the existing line or function it starts from.
+- **Stop and report if.** The assumptions that, if wrong, make the plan wrong.
+- **Execution report.** What it did and what it changed from the plan, written back into the plan file.
+
+A full plan with two phases, a report and a review: [`examples/2026-10-22-add-due-dates.md`](examples/2026-10-22-add-due-dates.md).
+
+## Commands
+
+| Command | What it does |
 |---|---|
-| Read code, docs, git history | Edit, create or delete project files |
-| Reuse what already exists | Build, install, run tests or commit |
-| Ask only when a decision blocks | Spawn subagents |
-| Write **one** file: the plan | Invent paths, symbols or commands |
+| `/plan-for-executor <task> [repo]` | Plan a task and hand out the executor prompt |
+| `/plan-for-executor review <plan>` | Check the executor's work against the plan |
+| `/plan-for-executor next <plan>` | Hand out the next phase of a multi-phase plan |
+| `python3 …/scripts/run_plan.py <plan>` | Open the executor session with the current prompt |
+| `python3 …/scripts/lint_plan.py <plan>` | Check a plan file |
 
-Its `allowed-tools` are read-only for real: no `find` (`-delete`/`-exec`), no `git branch` beyond `--show-current`/`--list`, no output redirection.
+Installed as a plugin, the slash command is namespaced: `/plan-for-executor:plan-for-executor`. `run_plan.py` options: `--phase N`, `--review-fix`, `--model haiku`, `--cwd DIR`, and `--print` to paste the prompt by hand instead.
 
-What the executor gets so it does not improvise:
-- **Base commit**: if the planned files changed since, it stops.
-- **Anchors**: every step names the existing line or symbol it starts from.
-- **STOP AND REPORT IF**: the assumptions that, if wrong, make the plan wrong.
-- **Execution report**: it writes what it did and what deviated back into the plan.
+## Customize
 
-## 📦 Install
+Add a profile at `~/.claude/plan-for-executor.profile.md`, or point `$PLAN_PROFILE` at one, to set:
 
-```text
-/plugin install plan-for-executor --marketplace Ivanzu37/plan-sonnet
-```
+- the plans folder, the language and the executor model;
+- extra frontmatter for every plan;
+- blocks added to every prompt, such as your formatter, your review command or your log.
 
-Or copy the skill folder:
+Start from [`profile.example.md`](skills/plan-for-executor/profile.example.md). A wrapper skill can point to its own profile, so a personal version stays a thin layer instead of a fork.
 
-```bash
-cp -r skills/plan-for-executor ~/.claude/skills/            # all projects
-cp -r skills/plan-for-executor <your-repo>/.claude/skills/  # one project
-```
+## Requirements
 
-The scripts need Python 3 (standard library only).
+- Claude Code 2.1 or later.
+- Python 3.9 or later for the scripts (standard library only).
+- Linux, macOS or Windows. On Windows, hooks run in Git Bash, which Claude Code already needs.
 
-## 🚀 Use
+## When not to use it
 
-```text
-/plan-for-executor add pagination to the /users endpoint
-/plan-for-executor migrate config loading to env vars ~/code/my-service
-/plan-for-executor review plans/2026-10-22-add-pagination.md
-/plan-for-executor next plans/2026-10-22-add-pagination.md
-```
+Skip it for one-line fixes and quick experiments: writing a plan costs more than the change. It pays off when a task spans several files, will take more than one session, or has to be done carefully by a cheaper model.
 
-Installed as a plugin, the command is namespaced: `/plan-for-executor:plan-for-executor`. Asking in plain words ("plan this for Sonnet", "review what Sonnet did") works too.
+## Under the hood
 
-Start the executor:
+- **Read-only planner.** `allowed-tools` only allows reading, plus writing the plan. A `PreToolUse` guard hook (`scripts/guard_readonly.py`) blocks shell writes (`>`, `>>`, `tee`, `sed -i`, `rm`, git commands that change the repo) and edits to anything that is not Markdown while the skill runs.
+- **Plan format.** `status` is one of `draft · approved · in-progress · blocked · done · dropped` (Spanish: `borrador · aprobado · en-curso · bloqueado · hecho · descartado`); progress lives in `phase: N/M`. The layout and the prompt template are in [`template.md`](skills/plan-for-executor/template.md).
+- **Lint.** `lint_plan.py` checks frontmatter, sections, one prompt block per phase, every prompt label, and references to the planning conversation. The planner runs it before every hand-off.
+- **Tests.** Unit tests for the scripts run on Linux, macOS and Windows: `python3 -m unittest discover -s tests`. The behaviour evals build toy repos and use your Claude quota: `claude plugin eval . --scaffold --allow-tools Bash Write Edit --judge-model sonnet` (the default judge is noisier).
 
-```bash
-python3 ~/.claude/skills/plan-for-executor/scripts/run_plan.py plans/2026-10-22-add-pagination.md
-# --phase N · --review-fix · --model haiku · --cwd DIR · --print (just print the prompt)
-```
+## Issues and ideas
 
-It lints the plan, picks the current phase and opens `claude --model <executor> "<prompt>"` in the plan's repo. Prefer pasting by hand? `--print`, or copy the block from chat.
+Found a bug or have an idea? [Open an issue](https://github.com/Ivanzu37/plan-for-executor/issues/new/choose). The templates ask for what is needed to reproduce it; remove private paths from any plan you paste.
 
-## 📄 What you get
+Pull requests are welcome. Keep the planner read-only, and run the unit tests and the lint on `examples/` before sending one.
 
-### The plan file
-
-```text
-plans/2026-10-22-add-pagination.md
-├── frontmatter    status · created · repo · branch · commit · phase N/M · executor
-├── Context        why, and where it starts from
-├── Decisions      chosen / rejected, plus what `next` changed per phase
-├── Reuse          existing code to build on
-├── Out of scope   what nobody asked for
-├── Files          what changes where
-├── Steps          ### Phase N → steps with file + anchor
-├── Risks          what not to touch
-├── Verification   exact commands + expected result
-├── Prompt         ### Phase N → one prompt block per phase
-├── Execution report   written by the executor
-└── Review         written by `review`
-```
-
-`status` is one of `draft · approved · in-progress · blocked · done · dropped` (Spanish: `borrador · aprobado · en-curso · bloqueado · hecho · descartado`). Progress lives in `phase`.
-
-A full example with two phases, a report and a review: [`examples/2026-10-22-add-due-dates.md`](examples/2026-10-22-add-due-dates.md).
-
-### The executor prompt
-
-````text
-You are working in /abs/path/repo, branch feature/x. Execute phase 1 of 2 of this plan yourself.
-
-CONTEXT            what the project is, what is wanted, why
-WORKING MODE       smallest complete change · one slice per step · root cause on failure
-BEFORE STARTING    status in-progress · stale check against base commit · files to read
-STEPS              1. /abs/file · anchor `def foo(` → concrete change
-DO NOT TOUCH       files, branches, project rules
-STOP AND REPORT IF assumptions that break the plan
-DONE WHEN          [ ] checkable criteria
-VERIFY             exact commands → expected result
-WHEN FINISHED      execution report · status · no commit unless asked
-````
-
-### The lint
-
-```bash
-python3 skills/plan-for-executor/scripts/lint_plan.py plans/*.md   # --strict-paths · --json
-```
-
-Errors: frontmatter, allowed status values, missing sections, a prompt block per phase, required labels in every block, references to "this conversation". Warnings: paths missing on this machine, relative paths in steps, no commit or branch. The planner runs it before handing off.
-
-## 🎛️ Customize
-
-Put a profile at `~/.claude/plan-for-executor.profile.md` (or point `$PLAN_PROFILE` at one) to set the plans folder, language, executor model, extra frontmatter, and blocks added to every prompt (your formatter, your review command, your log). Start from [`profile.example.md`](skills/plan-for-executor/profile.example.md). A wrapper skill can also point to its own profile: that is how a personal version stays a thin layer over this one instead of a fork.
-
-| Want to change | Where |
-|---|---|
-| Plans folder, language, executor | profile frontmatter |
-| Extra rules in every prompt | profile sections |
-| Plan layout, prompt labels | `template.md` |
-| Review / next behaviour | `modes/review.md`, `modes/next.md` |
-| Planner permissions | `allowed-tools` in `SKILL.md` |
-
-Executor `haiku` → steps carry literal code. A non-Claude executor → no Claude skills or slash commands in the prompt.
-
-## 🧪 Tests
-
-```bash
-python3 -m unittest discover -s tests -v                       # scripts, no API calls
-claude plugin eval . --scaffold --allow-tools Bash Write Edit  # skill behaviour, uses your quota
-```
-
-The evals build toy repos and check that planning never touches code, that the plan passes the lint, that `review` catches a step the executor skipped, and that `next` follows a rename reported in phase 1.
-
-## 🐛 Issues and ideas
-
-Found a bug or have an idea? [Open an issue](https://github.com/Ivanzu37/plan-sonnet/issues/new/choose); the templates ask for what is needed to reproduce it. Remove private paths from any plan you paste.
-
-Pull requests are welcome: keep the planner read-only, run `python3 -m unittest discover -s tests` and lint the examples before sending one.
-
-## 📜 License
+## License
 
 MIT © Ivanzu37

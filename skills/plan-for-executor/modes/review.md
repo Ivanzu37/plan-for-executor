@@ -11,7 +11,7 @@ Goal: compare what the executor did with what the plan asked, without touching t
    - Not a git repo → read the files listed in the report and the plan.
 3. **Compare, step by step.** For each step and each DONE WHEN item: ✅ done as planned · ⚠️ done differently (say how, and whether it is acceptable) · ❌ missing or wrong. Also list changes to files the plan did not mention and anything touching DO NOT TOUCH.
 4. **Verification.** You do not run commands. Say which VERIFY commands the report claims passed, which are missing, and what the user should run to confirm.
-5. **Write the review** at the end of the plan file:
+5. **Write the review** at the end of the plan file, with Edit on its last lines (never `>>` or another shell write):
 
    ```markdown
    ## Review — YYYY-MM-DD (phase N)
@@ -24,6 +24,6 @@ Goal: compare what the executor did with what the plan asked, without touching t
 
    - All ✅ (or acceptable ⚠️) and this was the last phase → `status: done`.
    - All ✅ and more phases remain → leave `in-progress` and point to `next`.
-   - Any ❌ → write a **fix prompt** in the review: one `text` block with the same labels as the executor prompt (template.md), only the missing work as STEPS, the same DO NOT TOUCH and STOP AND REPORT IF, and WHEN FINISHED asking for a `### Phase N fix — YYYY-MM-DD` report entry. Leave `in-progress` (or `blocked` if it needs a user decision).
+   - Any ❌ → write a **fix prompt** in the review: one `text` block with **every** label of the executor prompt (template.md), WORKING MODE and BEFORE STARTING included, only the missing work as STEPS, the same DO NOT TOUCH and STOP AND REPORT IF, and WHEN FINISHED asking for a `### Phase N fix — YYYY-MM-DD` report entry. Leave `in-progress` (or `blocked` if it needs a user decision).
 6. **Run the lint** on the plan (`scripts/lint_plan.py`) and fix what it reports in your own additions.
-7. **Hand off** in chat: the table, the verdict, and if there is one, the fix prompt plus the `run_plan.py <plan> --review-fix` command to launch it.
+7. **Hand off** in chat: the table, the verdict, and if there is one, the full fix prompt block (pasted in chat, not only written to the plan) plus the `run_plan.py <plan> --review-fix` command to launch it.
