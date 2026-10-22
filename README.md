@@ -32,6 +32,8 @@ You get a plan file, a prompt, and one command that opens the executor with it. 
 ## How it works
 
 <picture>
+  <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset="assets/cycle-vertical-dark.svg">
+  <source media="(max-width: 600px)" srcset="assets/cycle-vertical-light.svg">
   <source media="(prefers-color-scheme: dark)" srcset="assets/cycle-dark.svg">
   <img src="assets/cycle-light.svg" alt="The cycle: Plan with a strong model, Execute with a cheaper model in a fresh session, Review the diff against the plan, then Next phase or done. If the review finds something missing, a fix prompt goes back to Execute." width="880">
 </picture>
