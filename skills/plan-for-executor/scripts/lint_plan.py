@@ -130,6 +130,9 @@ def lint_prompt(prompt, where, warnings, strict_paths, check_paths=True):
 
 
 def main(argv):
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="replace")
     args = [a for a in argv if not a.startswith("--")]
     strict = "--strict-paths" in argv
     as_json = "--json" in argv

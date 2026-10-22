@@ -8,7 +8,7 @@ hooks:
     - matcher: "Bash|Write|Edit|MultiEdit|NotebookEdit"
       hooks:
         - type: command
-          command: python3 "${CLAUDE_SKILL_DIR}/scripts/guard_readonly.py"
+          command: python3 "${CLAUDE_SKILL_DIR}/scripts/guard_readonly.py" 2>/dev/null || python "${CLAUDE_SKILL_DIR}/scripts/guard_readonly.py"
 ---
 
 # Plan for executor
