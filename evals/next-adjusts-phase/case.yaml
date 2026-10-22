@@ -20,7 +20,8 @@ graders:
   - type: tool_used
     name: code-not-edited
     tool: Edit
-    input_match: "todo/cli\\.py|tests/"
+    input_match: 'file_path\W+[^"]*(todo/cli\.py|tests/[^"]*)"'
+    min: 0
     max: 0
   - type: tool_used
     name: plan-updated
@@ -31,6 +32,6 @@ graders:
   - type: llm
     name: phase-2-adjusted
     criteria: |
-      The answer hands out the phase 2 prompt in a fenced block whose step anchors on `show_tasks` (the name the executor
-      reported in phase 1), not on `cmd_list`; it says the plan moved to phase 2/2 with a new base commit; and it does not
-      rewrite or redo phase 1.
+      The answer hands out the phase 2 prompt in a fenced block whose step anchors on `def show_tasks(` (the name the
+      executor reported in phase 1) instead of `def cmd_list(`; mentioning the old name to explain the rename is fine.
+      It says the plan moved to phase 2/2 with a new base commit, and it does not rewrite or redo phase 1.

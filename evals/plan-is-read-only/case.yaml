@@ -21,12 +21,14 @@ graders:
   - type: tool_used
     name: code-not-written
     tool: Write
-    input_match: "todo/(cli|store|__main__)\\.py|tests/"
+    input_match: 'file_path\W+[^"]*(todo/(cli|store|__main__)\.py|tests/[^"]*)"'
+    min: 0
     max: 0
   - type: tool_used
     name: code-not-edited
     tool: Edit
-    input_match: "todo/(cli|store|__main__)\\.py|tests/"
+    input_match: 'file_path\W+[^"]*(todo/(cli|store|__main__)\.py|tests/[^"]*)"'
+    min: 0
     max: 0
   - type: tool_used
     name: plan-file-written
