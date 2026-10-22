@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="t">
+  <title id="t">plan-for-executor</title>
+  <rect width="1024" height="1024" rx="232" fill="#B85C38"/>
+  <g fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" transform="translate(-20 0)">
+    <path d="M300 268 L544 512 L300 756" stroke-width="136"/>
+    <path d="M644 382 L774 512 L644 642" stroke-width="96"/>
+  </g>
+</svg>
