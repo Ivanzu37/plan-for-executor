@@ -11,7 +11,7 @@
 - Size triage: prompt-only for tiny tasks, phases of up to ~6 steps for large ones.
 - Profiles (`$PLAN_PROFILE` or `~/.claude/plan-for-executor.profile.md`): plans folder, language, executor model and extra prompt blocks. `profile.example.md`.
 - `scripts/lint_plan.py` and `scripts/run_plan.py` (Python 3, standard library only).
-- Plugin manifest and marketplace (`/plugin install plan-for-executor --marketplace Ivanzu37/plan-sonnet`).
+- Plugin manifest and marketplace (`/plugin install plan-for-executor --marketplace Ivanzu37/plan-for-executor`).
 - `examples/`, unit tests for the scripts, `claude plugin eval` cases, CI.
 - Spanish labels for plans written in Spanish.
 - `guard_readonly.py`: a skill-scoped PreToolUse hook that blocks shell writes (`>`, `>>`, `tee`, `sed -i`, `rm`, state-changing git…) and Write/Edit on non-Markdown files.
