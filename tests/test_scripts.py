@@ -184,8 +184,19 @@ class RunPlanTest(unittest.TestCase):
                 "    json.dump({'cwd': os.getcwd(), 'argv': sys.argv[1:]}, fh)\n" % log
             )
         if os.name == "nt":
+            # same layout as the shim npm writes: claude.cmd -> node_modules/.../cli.js
+            pkg = os.path.join(bindir, "node_modules", "@anthropic-ai", "claude-code")
+            os.makedirs(pkg)
+            with open(os.path.join(pkg, "cli.js"), "w", encoding="utf-8") as fh:
+                fh.write(
+                    "require('fs').writeFileSync(%s, JSON.stringify({cwd: process.cwd(), "
+                    "argv: process.argv.slice(2)}));\n" % json.dumps(log)
+                )
             with open(os.path.join(bindir, "claude.cmd"), "w") as fh:
-                fh.write('@"%s" "%s" %%*\r\n' % (sys.executable, fake_py))
+                fh.write(
+                    '@ECHO off\r\nSETLOCAL\r\nSET dp0=%~dp0\r\n'
+                    '"node"  "%dp0%\\node_modules\\@anthropic-ai\\claude-code\\cli.js" %*\r\n'
+                )
         else:
             fake = os.path.join(bindir, "claude")
             with open(fake, "w") as fh:
