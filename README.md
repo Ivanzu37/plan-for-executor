@@ -186,6 +186,12 @@ claude plugin eval . --scaffold --allow-tools Bash Write Edit  # skill behaviour
 
 The evals build toy repos and check that planning never touches code, that the plan passes the lint, that `review` catches a step the executor skipped, and that `next` follows a rename reported in phase 1.
 
+## 🐛 Issues and ideas
+
+Found a bug or have an idea? [Open an issue](https://github.com/Ivanzu37/plan-sonnet/issues/new/choose); the templates ask for what is needed to reproduce it. Remove private paths from any plan you paste.
+
+Pull requests are welcome: keep the planner read-only, run `python3 -m unittest discover -s tests` and lint the examples before sending one.
+
 ## 📜 License
 
-MIT
+MIT © Ivanzu37
