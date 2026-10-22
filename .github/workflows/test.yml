@@ -21,6 +21,8 @@ jobs:
           D=skills/plan-for-executor
           ok='{"tool_name":"Bash","tool_input":{"command":"git log --oneline -5"}}'
           bad='{"tool_name":"Bash","tool_input":{"command":"echo x >> plan.md"}}'
-          run() { python3 "$D/scripts/guard_readonly.py" 2>/dev/null || python "$D/scripts/guard_readonly.py"; }
+          # the exact command from SKILL.md, with CLAUDE_SKILL_DIR pointing here
+          cmd=$(sed -n 's/^ *command: //p' $D/SKILL.md | sed "s/^'//; s/'$//")
+          run() { CLAUDE_SKILL_DIR=$D bash -c "${cmd//\$\{CLAUDE_SKILL_DIR\}/\$CLAUDE_SKILL_DIR}"; }
           echo "$ok" | run
           if echo "$bad" | run; then echo "guard did not block"; exit 1; fi

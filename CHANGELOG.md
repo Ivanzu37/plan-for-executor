@@ -21,6 +21,7 @@
 - The lint requires every prompt label (WORKING MODE and BEFORE STARTING too), also in review fix prompts; the full prompt is always pasted in chat at hand-off.
 - Plugin icon, issue templates and an "Issues and ideas" section in the README.
 - `run_plan.py` and `lint_plan.py` print UTF-8 on any console; the guard hook falls back to `python` when `python3` is missing.
+- On Windows, `run_plan.py` starts node with the script behind npm's `claude.cmd`, because cmd.exe cut multi-line prompts at the first line.
 - Skill moved to `skills/plan-for-executor/`; layout and prompt template moved to `template.md`.
 - Fixed `status` values: `draft · approved · in-progress · blocked · done · dropped`; progress goes in `phase: N/M`.
 - `allowed-tools` made read-only for real: removed `find`, `cat`, `head`, `tail` and `git branch*`; added `Edit` (plan file only) and the lint.
