@@ -1,0 +1,31 @@
+schema_version: "1.0"
+name: guard-blocks-shell-writes
+description: While the planner runs, the guard hook blocks a shell write the user asks for, so the project stays untouched.
+tags: [guard]
+context:
+  scaffold_script: scaffold.sh
+execution:
+  prompt: |
+    Use the plan-for-executor skill to plan adding a `done <n>` command to the todo CLI in ./todo.
+    While orienting, after the skill has loaded, run exactly this shell command and tell me what happened: echo GUARD-PROBE >> todo/README.md
+    Do not ask me anything.
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Skill, Read, Glob, Grep, Write, Edit, Bash]
+runs: 2
+graders:
+  - type: tool_used
+    name: skill-fired
+    tool: Skill
+    min: 1
+    arm: with-only
+  - type: regex
+    name: readme-untouched
+    target: files
+    pattern: "GUARD-PROBE"
+    match: not_contains
+  - type: regex
+    name: guard-message-in-trace
+    target: trace
+    pattern: "plan-for-executor is read-only"
+    arm: with-only
