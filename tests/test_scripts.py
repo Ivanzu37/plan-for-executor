@@ -50,6 +50,12 @@ Trabajas en {repo}, rama main.
 CONTEXTO
 Algo.
 
+MODO
+- El cambio más pequeño.
+
+ANTES DE EMPEZAR
+- Lee {repo}/a.txt.
+
 PASOS
 1. {repo}/a.txt · ancla `hola` → adiós.
 
@@ -109,6 +115,11 @@ class LintTest(unittest.TestCase):
     def test_phase_count_mismatch_fails(self):
         errors, _ = lint_text(EXAMPLE_TEXT.replace("phase: 2/2", "phase: 2/3"))
         self.assertTrue(any("no prompt block for phase 3" in e for e in errors))
+
+    def test_fix_prompt_needs_every_label(self):
+        text = EXAMPLE_TEXT + "\n## Review — 2026-10-24 (phase 2)\n```text\nCONTEXT\nx\n\nSTEPS\n1. a\n```\n"
+        errors, _ = lint_text(text)
+        self.assertTrue(any("review fix prompt has no WORKING MODE" in e for e in errors))
 
     def test_missing_section_fails(self):
         errors, _ = lint_text(EXAMPLE_TEXT.replace("## Verification", "## Checks"))

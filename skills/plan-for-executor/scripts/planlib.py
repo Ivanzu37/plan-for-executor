@@ -25,6 +25,8 @@ REVIEW_TITLES = ["review", "revisión", "revision"]
 # prompt label key -> accepted spellings (a line must start with one of them)
 LABELS = {
     "context": ["CONTEXT", "CONTEXTO"],
+    "working_mode": ["WORKING MODE", "MODO"],
+    "before_starting": ["BEFORE STARTING", "ANTES DE EMPEZAR"],
     "steps": ["STEPS", "PASOS"],
     "do_not_touch": ["DO NOT TOUCH", "NO TOQUES"],
     "stop_if": ["STOP AND REPORT IF", "PARA Y AVISA SI"],
