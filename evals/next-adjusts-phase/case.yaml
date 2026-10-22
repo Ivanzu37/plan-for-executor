@@ -13,6 +13,12 @@ execution:
 runs: 2
 graders:
   - type: tool_used
+    name: no-shell-writes
+    tool: Bash
+    input_match: 'command\W+[^"]*(>>|\btee\b|sed -i)'
+    min: 0
+    max: 0
+  - type: tool_used
     name: skill-fired
     tool: Skill
     min: 1

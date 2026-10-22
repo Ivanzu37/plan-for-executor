@@ -11,7 +11,7 @@ Goal: compare what the executor did with what the plan asked, without touching t
    - Not a git repo → read the files listed in the report and the plan.
 3. **Compare, step by step.** For each step and each DONE WHEN item: ✅ done as planned · ⚠️ done differently (say how, and whether it is acceptable) · ❌ missing or wrong. Also list changes to files the plan did not mention and anything touching DO NOT TOUCH.
 4. **Verification.** You do not run commands. Say which VERIFY commands the report claims passed, which are missing, and what the user should run to confirm.
-5. **Write the review** at the end of the plan file:
+5. **Write the review** at the end of the plan file, with Edit on its last lines (never `>>` or another shell write):
 
    ```markdown
    ## Review — YYYY-MM-DD (phase N)
