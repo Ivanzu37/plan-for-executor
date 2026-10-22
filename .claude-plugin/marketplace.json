@@ -1,0 +1,12 @@
+{
+  "name": "plan-sonnet",
+  "owner": { "name": "Ivanzu37", "url": "https://github.com/Ivanzu37" },
+  "plugins": [
+    {
+      "name": "plan-for-executor",
+      "source": "./",
+      "description": "A strong model plans read-only; a cheaper model executes the plan in a fresh session.",
+      "version": "0.2.0"
+    }
+  ]
+}
