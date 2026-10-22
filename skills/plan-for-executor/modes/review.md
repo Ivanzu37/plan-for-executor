@@ -26,4 +26,4 @@ Goal: compare what the executor did with what the plan asked, without touching t
    - All ✅ and more phases remain → leave `in-progress` and point to `next`.
    - Any ❌ → write a **fix prompt** in the review: one `text` block with the same labels as the executor prompt (template.md), only the missing work as STEPS, the same DO NOT TOUCH and STOP AND REPORT IF, and WHEN FINISHED asking for a `### Phase N fix — YYYY-MM-DD` report entry. Leave `in-progress` (or `blocked` if it needs a user decision).
 6. **Run the lint** on the plan (`scripts/lint_plan.py`) and fix what it reports in your own additions.
-7. **Hand off** in chat: the table, the verdict, and if there is one, the fix prompt plus the `run_plan.py <plan> --review-fix` command to launch it.
+7. **Hand off** in chat: the table, the verdict, and if there is one, the full fix prompt block (pasted in chat, not only written to the plan) plus the `run_plan.py <plan> --review-fix` command to launch it.

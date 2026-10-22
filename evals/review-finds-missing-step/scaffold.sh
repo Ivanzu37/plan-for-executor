@@ -84,13 +84,13 @@ $GIT commit -qm "todo: initial"
 BASE=$(git rev-parse --short HEAD)
 }
 
-prompt() { # $1 phase, $2 total, $3 steps, $4 done-when
+prompt() { # $1 phase, $2 total, $3 steps, $4 done-when, $5 context
 cat <<TXT
 \`\`\`text
 You are working in $R, branch main. Execute phase $1 of $2 of this plan yourself, without subagents.
 
 CONTEXT
-todo is a tiny Python CLI. We are adding a --verbose flag to list.
+todo is a tiny Python CLI. $5
 
 WORKING MODE
 - Smallest complete change; reuse before writing new code.
@@ -157,7 +157,7 @@ Add \`--verbose\` to \`todo list\`, printing the task count at the end.
 
 ## Prompt for the executor
 $(prompt 1 1 "1. $R/todo/cli.py · anchor \`sub.add_parser(\"list\")\` → add \`--verbose\` (store_true).
-2. $R/todo/cli.py · anchor \`def cmd_list(\` → when args.verbose, print \`N tasks\` after the list." "- [ ] \`python -m todo list --verbose\` ends with \`N tasks\`." | sed "s/PLANFILE/2026-10-22-verbose.md/g")
+2. $R/todo/cli.py · anchor \`def cmd_list(\` → when args.verbose, print \`N tasks\` after the list." "- [ ] \`python -m todo list --verbose\` ends with \`N tasks\`." "We are adding a --verbose flag to list." | sed "s/PLANFILE/2026-10-22-verbose.md/g")
 
 ## Execution report
 ### Phase 1 — 2026-10-22
@@ -210,10 +210,10 @@ Tasks get an optional priority (phase 1) and list sorts by it (phase 2).
 
 ## Prompt for the executor
 ### Phase 1
-$(prompt 1 2 "1. $R/todo/cli.py · anchor \`add.add_argument(\"title\")\` → add \`--priority\` (int, default 2); cmd_add stores it." "- [ ] added tasks carry a priority." | sed "s/PLANFILE/2026-10-22-priority.md/g")
+$(prompt 1 2 "1. $R/todo/cli.py · anchor \`add.add_argument(\"title\")\` → add \`--priority\` (int, default 2); cmd_add stores it." "- [ ] added tasks carry a priority." "Tasks get an optional priority; this phase stores it." | sed "s/PLANFILE/2026-10-22-priority.md/g")
 
 ### Phase 2
-$(prompt 2 2 "1. $R/todo/cli.py · anchor \`def cmd_list(\` → sort tasks by priority (missing = 2) before printing." "- [ ] list prints priority 1 first." | sed "s/PLANFILE/2026-10-22-priority.md/g")
+$(prompt 2 2 "1. $R/todo/cli.py · anchor \`def cmd_list(\` → sort tasks by priority (missing = 2) before printing." "- [ ] list prints priority 1 first." "Tasks have a priority since phase 1; this phase sorts list by it." | sed "s/PLANFILE/2026-10-22-priority.md/g")
 
 ## Execution report
 ### Phase 1 — 2026-10-22
