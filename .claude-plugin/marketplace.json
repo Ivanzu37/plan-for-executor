@@ -1,5 +1,5 @@
 {
-  "name": "plan-sonnet",
+  "name": "plan-for-executor",
   "description": "Plan with a strong model, execute with a cheaper one, review the result.",
   "owner": {
     "name": "Ivanzu37",
